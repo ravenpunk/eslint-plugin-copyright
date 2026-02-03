@@ -15,8 +15,6 @@ export type MessageIds =
   | 'duplicateCopyright'
   | 'invalidCopyrightFormat';
 
-const DEFAULT_EXTENSIONS = ['js', 'jsx', 'ts', 'tsx', 'css'];
-
 function escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -52,7 +50,7 @@ export const copyrightRule: Rule.RuleModule = {
           extensions: {
             type: 'array',
             description:
-              'File extensions to check (without leading dot). Defaults to js/jsx/ts/tsx/css.',
+              'Optional allow-list of file extensions to check (without leading dot). Prefer ESLint `files` globs.',
             items: { type: 'string' },
           },
         },
@@ -88,10 +86,12 @@ export const copyrightRule: Rule.RuleModule = {
     // Check if the file extension is supported
     const filePath = context.filename;
     const fileExtension = path.extname(filePath).slice(1).toLowerCase();
-    const supportedExtensions = normalizeExtensions(options.extensions ?? DEFAULT_EXTENSIONS);
+    const extensionAllowList = options.extensions?.length
+      ? new Set(normalizeExtensions(options.extensions))
+      : undefined;
 
-    // Skip processing if file extension is not supported
-    if (!fileExtension || !supportedExtensions.includes(fileExtension)) {
+    // If an allow-list is configured, skip files that don't match it.
+    if (extensionAllowList && (!fileExtension || !extensionAllowList.has(fileExtension))) {
       return {};
     }
 

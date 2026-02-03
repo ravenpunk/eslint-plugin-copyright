@@ -48,3 +48,9 @@ Thumbs.db
 
 # TypeScript
 *.tsbuildinfo
+
+# Editor swap/backup files
+*.swp
+*.swo
+*.swx
+*~

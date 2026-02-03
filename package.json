@@ -1,12 +1,16 @@
 {
   "name": "eslint-plugin-copyright",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Ensure files have up-to-date copyright notices. Supports Typescript + ESLint flat config.",
   "author": "John Cramb <john@ravenpunk.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ravenpunk/eslint-plugin-copyright"
+    "url": "https://github.com/ravenpunk/eslint-plugin-copyright.git"
   },
+  "bugs": {
+    "url": "https://github.com/ravenpunk/eslint-plugin-copyright/issues"
+  },
+  "homepage": "https://github.com/ravenpunk/eslint-plugin-copyright#readme",
   "license": "MIT",
   "keywords": [
     "eslint",
