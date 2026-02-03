@@ -19,6 +19,29 @@ function escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function buildCopyrightTextPattern(template: string): string {
+  const YEAR_TOKEN = '__YEAR__';
+  const COPYRIGHT_TOKEN = '__COPYRIGHT__';
+
+  const templateWithTokens = template
+    .replace(/YYYY/gu, YEAR_TOKEN)
+    .replace(/©|\(c\)|\(C\)|&copy;|&#169;|&#xa9;/giu, COPYRIGHT_TOKEN)
+    .replace(/\s+/gu, ' ');
+
+  let escaped = escapeRegExp(templateWithTokens);
+  escaped = escaped.replace(new RegExp(escapeRegExp(YEAR_TOKEN), 'gu'), '\\d{4}');
+  escaped = escaped.replace(
+    new RegExp(escapeRegExp(COPYRIGHT_TOKEN), 'gu'),
+    '(?:©|\\(\\s*c\\s*\\)|&copy;|&#169;|&#xa9;)'
+  );
+
+  // Allow flexible whitespace in the "detection" regex while keeping the
+  // "strict format" regex exact (one space, correct symbol, etc.).
+  escaped = escaped.replace(/ /gu, '\\s+');
+
+  return escaped;
+}
+
 function normalizeExtensions(extensions: string[]): string[] {
   return extensions
     .map(extension => extension.trim().toLowerCase().replace(/^\./u, ''))
@@ -117,18 +140,22 @@ export const copyrightRule: Rule.RuleModule = {
 
       // Create regex for detecting copyright text with any year
       // Escape special regex characters in the copyright text except YYYY
-      const escapedCopyrightText: string = escapeRegExp(template).replace(/YYYY/gu, '\\d{4}');
+      const escapedCopyrightTextStrict: string = escapeRegExp(template).replace(/YYYY/gu, '\\d{4}');
+      const escapedCopyrightTextLoose: string = buildCopyrightTextPattern(template);
 
       // Create regexes for different comment styles to find copyright (tolerant for detection)
-      const singleLineRegex = `\\/\\/\\s*${escapedCopyrightText}`;
-      const multiLineRegex = `\\/\\*\\s*${escapedCopyrightText}\\s*\\*\\/`;
+      const singleLineRegexStrict = `\\/\\/\\s*${escapedCopyrightTextStrict}`;
+      const multiLineRegexStrict = `\\/\\*\\s*${escapedCopyrightTextStrict}\\s*\\*\\/`;
 
-      const singleLineCommentRegex = new RegExp(`^\\s*${singleLineRegex}\\s*$`);
-      const multiLineCommentRegex = new RegExp(`^\\s*${multiLineRegex}\\s*$`);
+      const singleLineRegexLoose = `\\/\\/\\s*${escapedCopyrightTextLoose}`;
+      const multiLineRegexLoose = `\\/\\*\\s*${escapedCopyrightTextLoose}\\s*\\*\\/`;
+
+      const singleLineCommentRegex = new RegExp(`^\\s*${singleLineRegexStrict}\\s*$`);
+      const multiLineCommentRegex = new RegExp(`^\\s*${multiLineRegexStrict}\\s*$`);
 
       // Create case-insensitive regexes for detecting copyright text with incorrect case
-      const singleLineRegexCaseInsensitive = singleLineRegex; // Same as above, just used with 'i' flag
-      const multiLineRegexCaseInsensitive = multiLineRegex; // Same as above, just used with 'i' flag
+      const singleLineRegexCaseInsensitive = singleLineRegexLoose; // Used with 'i' flag
+      const multiLineRegexCaseInsensitive = multiLineRegexLoose; // Used with 'i' flag
 
       const singleLineCommentRegexCaseInsensitive = new RegExp(
         `^\\s*${singleLineRegexCaseInsensitive}\\s*$`,
@@ -140,8 +167,10 @@ export const copyrightRule: Rule.RuleModule = {
       );
 
       // Strict format check: correct comment token, one space padding, no leading/trailing whitespace
-      const strictSingleLineCommentRegex = new RegExp(`^\\/\\/ ${escapedCopyrightText}$`);
-      const strictMultiLineCommentRegex = new RegExp(`^\\/\\* ${escapedCopyrightText} \\*\\/$`);
+      const strictSingleLineCommentRegex = new RegExp(`^\\/\\/ ${escapedCopyrightTextStrict}$`);
+      const strictMultiLineCommentRegex = new RegExp(
+        `^\\/\\* ${escapedCopyrightTextStrict} \\*\\/$`
+      );
 
       const isBlankLine = (line: string) => line.trim() === '';
 

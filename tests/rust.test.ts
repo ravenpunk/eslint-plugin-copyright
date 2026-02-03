@@ -93,5 +93,12 @@ rustTester.run('copyright (Rust)', copyrightRule, {
       errors: [{ messageId: 'duplicateCopyright' }],
       output: '// Copyright © 2026\n\nfn main() {}\n',
     },
+    {
+      code: `// Copyright © 2026 Raven Punk LLC. All rights reserved.\n\n// copyright (c) 2026 Raven Punk LLC. all rights reserved.\n\nuse serde::de::DeserializeOwned;\nuse serde_json::error::Category;\n`,
+      filename: 'file.rs',
+      options: [{ template: 'Copyright © YYYY Raven Punk LLC. All rights reserved.', newlines: 2 }],
+      errors: [{ messageId: 'duplicateCopyright' }],
+      output: `// Copyright © 2026 Raven Punk LLC. All rights reserved.\n\nuse serde::de::DeserializeOwned;\nuse serde_json::error::Category;\n`,
+    },
   ],
 });

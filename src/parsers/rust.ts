@@ -14,7 +14,7 @@ function getEndLoc(text: string): { line: number; column: number } {
 export const rustParser: Linter.Parser = {
   meta: {
     name: 'eslint-plugin-copyright/rust-parser',
-    version: '1.2.0',
+    version: '1.2.1',
   },
   parseForESLint(text: string) {
     const end = getEndLoc(text);

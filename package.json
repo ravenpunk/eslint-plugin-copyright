@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-copyright",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Ensure files have up-to-date copyright notices. Supports Typescript + ESLint flat config.",
   "author": "John Cramb <john@ravenpunk.com>",
   "repository": {
