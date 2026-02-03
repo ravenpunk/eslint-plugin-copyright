@@ -2,7 +2,7 @@ import { copyrightRule } from './rules/copyright.js';
 
 export default {
   meta: {
-    name: 'eslint-copyright-plugin',
+    name: 'eslint-plugin-copyright',
     version: '1.0.0',
   },
   rules: {

@@ -66,6 +66,12 @@ ruleTester.run('copyright (TS)', copyrightRule, {
       filename: 'file.d.ts',
       options: [{ template: 'Copyright © YYYY' }],
     },
+    // Unsupported extensions are skipped by default
+    {
+      code: 'const foo = "bar";',
+      filename: 'file.rs',
+      options: [{ template: 'Copyright © YYYY', newlines: 1 }],
+    },
   ],
   invalid: [
     // Missing copyright in JS file
@@ -131,6 +137,30 @@ ruleTester.run('copyright (TS)', copyrightRule, {
       options: [{ template: 'Copyright © YYYY', newlines: 2 }],
       errors: [{ messageId: 'incorrectNewlines' }],
       output: '// Copyright © 2025\n\n/// <reference types="@solidjs/start/env" />',
+    },
+    // Duplicate copyright notices (even when separated by newlines)
+    {
+      code: '// Copyright © 2025\n\n// Copyright © 2025\n\nconst foo = "bar";',
+      filename: 'file.js',
+      options: [{ template: 'Copyright © YYYY', newlines: 2 }],
+      errors: [{ messageId: 'duplicateCopyright' }],
+      output: '// Copyright © 2025\n\nconst foo = "bar";',
+    },
+    // Support configurable extensions
+    {
+      code: 'const foo = "bar";',
+      filename: 'file.rs',
+      options: [{ template: 'Copyright © YYYY', newlines: 1, extensions: ['rs'] }],
+      errors: [{ messageId: 'missingCopyright' }],
+      output: '// Copyright © 2025\nconst foo = "bar";',
+    },
+    // Extensions option is normalized (leading dot + case)
+    {
+      code: 'const foo = "bar";',
+      filename: 'file.RS',
+      options: [{ template: 'Copyright © YYYY', newlines: 1, extensions: ['.rs'] }],
+      errors: [{ messageId: 'missingCopyright' }],
+      output: '// Copyright © 2025\nconst foo = "bar";',
     },
   ],
 });
@@ -210,6 +240,20 @@ cssTester.run('copyright (CSS) - newline requirements', copyrightRule, {
       filename: 'file.css',
       options: [{ template: 'Copyright © YYYY', newlines: 2 }],
       errors: [{ messageId: 'incorrectNewlines' }],
+      output: '/* Copyright © 2025 */\n\nbody { color: red; }',
+    },
+  ],
+});
+
+// Test duplicate detection in CSS copyright notices
+cssTester.run('copyright (CSS) - duplicate detection', copyrightRule, {
+  valid: [],
+  invalid: [
+    {
+      code: '/* Copyright © 2025 */\n\n/* Copyright © 2025 */\n\nbody { color: red; }',
+      filename: 'file.css',
+      options: [{ template: 'Copyright © YYYY', newlines: 2 }],
+      errors: [{ messageId: 'duplicateCopyright' }],
       output: '/* Copyright © 2025 */\n\nbody { color: red; }',
     },
   ],
