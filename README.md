@@ -4,15 +4,17 @@ Are you tired of plugins that treat TypeScript like a second-class citizen? Or p
 
 Worry not my weary friend for at last you've stumbled upon **eslint-plugin-copyright** - a plugin with types that actually work and first-class flat config support that won't make you question your life choices.
 
-Because in 2025, your copyright plugin should be at least as modern as the javascript framework released last week which you've just adopted for a complete rewrite.
+Because in 2026, your copyright plugin should be at least as modern as the javascript framework released last week which you've just adopted for a complete rewrite.
 
 ## Features
 
 - Ensure copyright notices are the first line in files (no whitespace or other comments above)
-- Works with JavaScript, TypeScript, and CSS files using appropriate comment styles (`//` for JS/TS, `/* */` for CSS)
+- Works with JavaScript, TypeScript, and CSS files by default using appropriate comment styles (`//` for JS/TS, `/* */` for CSS)
 - Automatically updates copyright year to the current year when outdated
 - Configurable copyright text with year placeholder (YYYY)
+- Configurable file extensions to check (e.g. add `rs` to lint Rust files)
 - Configurable number of newlines after the copyright comment
+- Detects and auto-fixes duplicate copyright notices at the top of files
 - Compatible with both ESLint flat config and traditional config formats
 - Built with TypeScript for full type definitions
 
@@ -20,31 +22,32 @@ Because in 2025, your copyright plugin should be at least as modern as the javas
 
 ```bash
 # Using pnpm
-pnpm add -D eslint-copyright-plugin
+pnpm add -D eslint-plugin-copyright
 
 # Or if your taste is more questionable...
 
 # Using npm
-npm install eslint-copyright-plugin --save-dev
+npm install eslint-plugin-copyright --save-dev
 
 # Using yarn
-yarn add eslint-copyright-plugin --dev
+yarn add eslint-plugin-copyright --dev
 ```
 
 ## Usage
 
 ### Configuration Options
 
-| Option     | Type   | Required | Default               | Description                                                                    |
-| ---------- | ------ | -------- | --------------------- | ------------------------------------------------------------------------------ |
-| `template` | string | Yes      | `'Copyright © YYYY'` | The copyright text template. Use `YYYY` as a placeholder for the current year. |
-| `newlines` | number | No       | `2`                   | Number of newlines to append after the copyright comment.                      |
+| Option       | Type     | Required | Default                         | Description                                                                    |
+| ------------ | -------- | -------- | ------------------------------- | ------------------------------------------------------------------------------ |
+| `template`   | string   | Yes      | `'Copyright © YYYY'`            | The copyright text template. Use `YYYY` as a placeholder for the current year. |
+| `newlines`   | number   | No       | `2`                             | Number of newlines to append after the copyright comment.                      |
+| `extensions` | string[] | No       | `['js','jsx','ts','tsx','css']` | File extensions to check (without leading dot).                                |
 
 ### ESLint Flat Config (recommended)
 
 ```ts
 // eslint.config.ts
-import copyright from 'eslint-copyright-plugin';
+import copyright from 'eslint-plugin-copyright';
 
 export default [
   {
@@ -69,9 +72,9 @@ export default [
 ```js
 // .eslintrc.js
 module.exports = {
-  plugins: ['eslint-copyright-plugin'],
+  plugins: ['copyright'],
   rules: {
-    'eslint-copyright-plugin/copyright': [
+    'copyright/notice': [
       'error',
       {
         template: 'Copyright © YYYY InvestInMyAI LLC. All rights reserved.',
